@@ -1,53 +1,70 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import { scale, verticalScale } from "@/utils/styling";
 
-import { Platform } from 'react-native';
+export const colors = {
+  primary: "#A3E635",
+  primaryLight: "#C6F36C",
+  primaryDark: "#7FB528",
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+  text: "#FFFFFF",
+  textLight: "#E5E5E5",
+  textLighter: "#D4D4D4",
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+  white: "#FFFFFF",
+  black: "#000000",
+
+  rose: "#EF4444",
+  green: "#16A34A",
+
+  neutral50: "#0B0B0C",
+  neutral100: "#101214",
+  neutral200: "#17191C",
+  neutral300: "#1F2225",
+  neutral350: "#262A2E",
+  neutral400: "#31363B",
+  neutral500: "#5B636B",
+  neutral600: "#7A828A",
+  neutral700: "#9AA2AA",
+  neutral800: "#C0C6CC",
+  neutral900: "#E5E7EB",
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const spacingX = {
+  _3: scale(3),
+  _5: scale(5),
+  _7: scale(7),
+  _10: scale(10),
+  _12: scale(12),
+  _15: scale(15),
+  _20: scale(20),
+  _25: scale(25),
+  _30: scale(30),
+  _35: scale(35),
+  _40: scale(40),
+};
+
+export const spacingY = {
+  _5: verticalScale(5),
+  _7: verticalScale(7),
+  _10: verticalScale(10),
+  _12: verticalScale(12),
+  _15: verticalScale(15),
+  _17: verticalScale(17),
+  _20: verticalScale(20),
+  _25: verticalScale(25),
+  _30: verticalScale(30),
+  _35: verticalScale(35),
+  _40: verticalScale(40),
+  _50: verticalScale(50),
+  _60: verticalScale(60),
+};
+
+export const radius = {
+  _3: verticalScale(3),
+  _6: verticalScale(6),
+  _10: verticalScale(10),
+  _12: verticalScale(12),
+  _15: verticalScale(15),
+  _17: verticalScale(17),
+  _20: verticalScale(20),
+  _30: verticalScale(30),
+};
