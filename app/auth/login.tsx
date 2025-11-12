@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 import BackButton from "@/components/BackButton";
@@ -10,22 +10,29 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 
 import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/context/authContext";
 import { verticalScale } from "@/utils/styling";
 import * as Icons from "phosphor-react-native";
 
 const Login = () => {
   const router = useRouter();
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const email = useRef("");
+  const password = useRef("");
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    if (!email.current || !password.current) {
+      Alert.alert("Login", "Please fill all the fields!");
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert("Demo", "Aquí irá la lógica de login 🧠");
-    }, 600);
+    const res = await login(email.current, password.current);
+    setLoading(false);
+    if (!res.success) {
+      Alert.alert("Login", res.msg);
+    }
   };
 
   return (
@@ -61,8 +68,7 @@ const Login = () => {
             placeholder="Enter your email"
             keyboardType="email-address"
             autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
+            onChangeText={(value) => (email.current = value)}
           />
 
           <Input
@@ -75,8 +81,7 @@ const Login = () => {
             }
             placeholder="Enter your password"
             secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            onChangeText={(value) => (password.current = value)}
             // editable={!loading}
           />
 
