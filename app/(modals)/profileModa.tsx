@@ -11,6 +11,7 @@ import { updateUser } from "@/services/userService";
 import { UserDataType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
 import { useEffect, useState } from "react";
@@ -37,6 +38,21 @@ const ProfileModal = () => {
       image: user?.image || null,
     });
   }, [user]);
+
+  const onPickImage = async () => {
+    let result: ImagePicker.ImagePickerResult =
+      await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        aspect: [4, 3],
+        quality: 0.5,
+      });
+    if (!result.canceled) {
+      setUserData({
+        ...userData,
+        image: result.assets?.[0],
+      });
+    }
+  };
 
   const onSubmit = async () => {
     let { name, image } = userData;
@@ -72,7 +88,7 @@ const ProfileModal = () => {
               contentFit="cover"
               transition={100}
             />
-            <TouchableOpacity style={styles.editIcon}>
+            <TouchableOpacity style={styles.editIcon} onPress={onPickImage}>
               <Icons.Pencil
                 size={verticalScale(20)}
                 color={colors.neutral900}
