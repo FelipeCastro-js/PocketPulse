@@ -12,7 +12,7 @@ const Input = (props: InputProps) => {
       {props.icon && props.icon}
       <TextInput
         style={[
-          { flex: 1, color: colors.white, fontSize: verticalScale(14) },
+          { flex: 1, color: colors.black, fontSize: verticalScale(14) },
           props.inputStyle,
         ]}
         placeholderTextColor={colors.neutral400}

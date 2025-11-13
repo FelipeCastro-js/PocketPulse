@@ -100,7 +100,7 @@ const Login = () => {
         {/* footer */}
         <View style={styles.footer}>
           <Typo size={15}>Don't have an account?</Typo>
-          <Pressable onPress={() => router.push("/auth/register")}>
+          <Pressable onPress={() => router.push("/register")}>
             <Typo size={15} fontWeight={"700"} color={colors.primary}>
               Sign up
             </Typo>

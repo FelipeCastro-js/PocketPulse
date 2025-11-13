@@ -7,7 +7,12 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="(modals)/profileModa"
+            options={{ presentation: "modal" }}
+          />
+        </Stack>
       </SafeAreaProvider>
     </AuthProvider>
   );

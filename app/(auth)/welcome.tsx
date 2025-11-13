@@ -19,7 +19,7 @@ const WelcomePage = () => {
         {/* login & image */}
         <View>
           <TouchableOpacity
-            onPress={() => router.push("/auth/login")}
+            onPress={() => router.push("/login")}
             style={styles.loginButton}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
@@ -70,7 +70,7 @@ const WelcomePage = () => {
               .damping(12)}
             style={styles.buttonContainer}
           >
-            <Button onPress={() => router.push("/auth/register")}>
+            <Button onPress={() => router.push("/register")}>
               <Typo size={22} color={colors.black} fontWeight={"600"}>
                 Get Started
               </Typo>
