@@ -10,6 +10,8 @@ import {
   ViewStyle,
 } from "react-native";
 
+export type CurrencyCode = "USD" | "COP";
+
 export type ScreenWrapperProps = {
   style?: ViewStyle;
   children: React.ReactNode;
@@ -74,6 +76,7 @@ export type TransactionType = {
   image?: any;
   uid?: string;
   walletId: string;
+  currency: CurrencyCode;
 };
 
 export type CategoryType = {
@@ -160,11 +163,12 @@ export type ResponseType = {
 
 export type WalletType = {
   id?: string;
+  uid?: string;
   name: string;
+  image: any;
   amount?: number;
   totalIncome?: number;
   totalExpenses?: number;
-  image: any;
-  uid?: string;
   created?: Date;
+  currency: CurrencyCode;
 };

@@ -1,81 +1,67 @@
 import * as Icons from "phosphor-react-native";
-import React, { useMemo, useState } from "react";
-import {
-  FlatList,
-  ListRenderItemInfo,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 
+import Loading from "@/components/Loading";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
+import WalletCard from "@/components/WalletCard";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/context/authContext";
+import useFetchData from "@/hooks/useFetchData";
+import { getRates } from "@/services/ratesService";
+import { CurrencyCode, WalletType } from "@/types";
+import { convertCurrency, formatMoney } from "@/utils/money";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
-
-type WalletItem = {
-  id: string;
-  name: string;
-  amount: number;
-};
-
-const MOCK_WALLETS: WalletItem[] = [
-  { id: "1", name: "Main Wallet", amount: 1245000 },
-  { id: "2", name: "Savings", amount: 955000 },
-  { id: "3", name: "Travel", amount: 210000 },
-];
-
-function formatNumber(n: number) {
-  try {
-    return new Intl.NumberFormat("en-US").format(n);
-  } catch {
-    return `${n}`;
-  }
-}
+import { orderBy, where } from "firebase/firestore";
 
 const Wallet = () => {
   const router = useRouter();
+  const { user } = useAuth();
+
   const [showBalance, setShowBalance] = useState<boolean>(false);
+  const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>("USD");
+  const [rates, setRates] = useState<Record<CurrencyCode, number>>({
+    USD: 1,
+    COP: 4200,
+  });
 
-  const total = useMemo(
-    () => MOCK_WALLETS.reduce((acc, w) => acc + (w.amount || 0), 0),
-    []
+  const constraints = useMemo(
+    () => [
+      where("uid", "==", user?.uid || "__none__"),
+      orderBy("created", "desc"),
+    ],
+    [user?.uid]
   );
 
-  const renderItem = ({ item }: ListRenderItemInfo<WalletItem>) => (
-    <View style={styles.card}>
-      <View style={styles.left}>
-        <View style={styles.iconWrap}>
-          <Icons.Wallet
-            size={verticalScale(22)}
-            color={colors.text}
-            weight="fill"
-          />
-        </View>
-
-        <View style={{ gap: spacingY._5 }}>
-          <Typo size={16} fontWeight="600" color={colors.text}>
-            {item.name}
-          </Typo>
-          <Typo size={14} color={colors.neutral500}>
-            COP {showBalance ? formatNumber(item.amount) : "****"}
-          </Typo>
-        </View>
-      </View>
-
-      <Icons.CaretRight
-        size={verticalScale(20)}
-        color={colors.neutral600}
-        weight="bold"
-      />
-    </View>
+  const { data: wallets, loading } = useFetchData<WalletType>(
+    "wallets",
+    constraints
   );
+
+  useEffect(() => {
+    (async () => {
+      const r = await getRates();
+      setRates(r);
+    })();
+  }, []);
+
+  const totalBalance = useMemo(() => {
+    return wallets.reduce((total, w) => {
+      const amountInDisplay = convertCurrency(
+        w?.amount || 0,
+        (w?.currency || "USD") as CurrencyCode,
+        displayCurrency,
+        rates
+      );
+      return total + amountInDisplay;
+    }, 0);
+  }, [wallets, displayCurrency, rates]);
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
       <View style={styles.container}>
-        {/* Top balance section */}
         <View style={styles.balanceView}>
           <View style={styles.balanceContainer}>
             <View style={styles.balanceHeader}>
@@ -105,12 +91,53 @@ const Wallet = () => {
             </View>
 
             <Typo size={45} fontWeight="700" color={colors.white}>
-              COP {showBalance ? formatNumber(total) : "****"}
+              {showBalance
+                ? formatMoney(totalBalance, displayCurrency)
+                : `${displayCurrency} ****`}
             </Typo>
+
+            <View style={styles.currencyToggle}>
+              <TouchableOpacity
+                style={[
+                  styles.toggleChip,
+                  displayCurrency === "USD" && styles.toggleChipActive,
+                ]}
+                onPress={() => setDisplayCurrency("USD")}
+                activeOpacity={0.8}
+              >
+                <Typo
+                  size={14}
+                  color={
+                    displayCurrency === "USD" ? colors.black : colors.neutral300
+                  }
+                  fontWeight={displayCurrency === "USD" ? "700" : "500"}
+                >
+                  USD
+                </Typo>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.toggleChip,
+                  displayCurrency === "COP" && styles.toggleChipActive,
+                ]}
+                onPress={() => setDisplayCurrency("COP")}
+                activeOpacity={0.8}
+              >
+                <Typo
+                  size={14}
+                  color={
+                    displayCurrency === "COP" ? colors.black : colors.neutral300
+                  }
+                  fontWeight={displayCurrency === "COP" ? "700" : "500"}
+                >
+                  COP
+                </Typo>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        {/* Bottom panel with list */}
         <View style={styles.wallets}>
           <View style={styles.headerRow}>
             <Typo size={20} fontWeight="700" color={colors.text}>
@@ -129,14 +156,20 @@ const Wallet = () => {
             </TouchableOpacity>
           </View>
 
+          {loading && <Loading />}
+
           <FlatList
-            data={MOCK_WALLETS}
-            keyExtractor={(it) => it.id}
-            renderItem={renderItem}
-            contentContainerStyle={styles.listStyle}
-            ItemSeparatorComponent={() => (
-              <View style={{ height: spacingY._10 }} />
+            data={wallets}
+            keyExtractor={(item) => item.id as string}
+            renderItem={({ item, index }) => (
+              <WalletCard
+                item={item}
+                router={router}
+                index={index}
+                showBalance={showBalance}
+              />
             )}
+            contentContainerStyle={styles.listStyle}
           />
         </View>
       </View>
@@ -153,9 +186,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.black,
   },
 
-  /* Top */
   balanceView: {
-    height: verticalScale(160),
+    height: verticalScale(180),
     backgroundColor: colors.black,
     justifyContent: "center",
     alignItems: "center",
@@ -169,8 +201,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacingX._10,
   },
+  currencyToggle: {
+    flexDirection: "row",
+    gap: spacingX._10,
+    marginTop: spacingY._5,
+  },
+  toggleChip: {
+    paddingHorizontal: spacingX._12,
+    paddingVertical: spacingY._7,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.neutral700,
+    backgroundColor: colors.black,
+  },
+  toggleChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
 
-  /* Bottom panel */
   wallets: {
     flex: 1,
     backgroundColor: colors.neutral100,
@@ -188,41 +236,6 @@ const styles = StyleSheet.create({
   listStyle: {
     paddingVertical: spacingY._25,
     paddingTop: spacingY._15,
-  },
-
-  /* Card */
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    paddingVertical: spacingY._12,
-    paddingHorizontal: spacingX._15,
-
-    backgroundColor: colors.white,
-    borderRadius: radius._15,
-    borderCurve: "continuous",
-    borderWidth: 1,
-    borderColor: colors.neutral300,
-
-    shadowColor: colors.black,
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  left: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacingX._12,
-  },
-  iconWrap: {
-    height: verticalScale(44),
-    width: verticalScale(44),
-    borderRadius: radius._12,
-    borderCurve: "continuous",
-    backgroundColor: colors.neutral200,
-    alignItems: "center",
-    justifyContent: "center",
+    gap: spacingY._12,
   },
 });

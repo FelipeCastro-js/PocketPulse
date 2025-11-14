@@ -11,8 +11,10 @@ import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 import BackButton from "@/components/BackButton";
+import { SUPPORTED_CURRENCIES } from "@/constants/currency";
 import { useAuth } from "@/context/authContext";
-import { WalletType } from "@/types";
+import { CurrencyCode, WalletType } from "@/types";
+import { Picker } from "@react-native-picker/picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
 
@@ -20,21 +22,27 @@ const WalletModal = () => {
   const [wallet, setWallet] = useState<WalletType>({
     name: "",
     image: null,
+    currency: "USD",
   });
+  const params = useLocalSearchParams() as {
+    id?: string;
+    name?: string;
+    image?: string;
+    currency?: CurrencyCode;
+  };
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const oldWallet: { name: string; image: string; id?: string } =
-    useLocalSearchParams();
 
   useEffect(() => {
-    if (oldWallet?.id) {
+    if (params?.id) {
       setWallet({
-        name: oldWallet.name,
-        image: oldWallet?.image || null,
+        name: params.name || "",
+        image: params?.image || null,
+        currency: (params.currency as CurrencyCode) || "USD",
       });
     }
-  }, []);
+  }, [params?.id, params?.name, params?.image, params?.currency]);
 
   const onSelectImage = (file: any) => {
     if (file) setWallet({ ...wallet, image: file });
@@ -49,11 +57,12 @@ const WalletModal = () => {
     }
 
     setLoading(true);
-    const data: WalletType = {
-      name,
-      image,
+    const data: Partial<WalletType> = {
       uid: user?.uid,
-      ...(oldWallet.id ? { id: oldWallet.id } : {}),
+      name: wallet.name.trim(),
+      image: wallet.image,
+      currency: wallet.currency,
+      ...(params.id ? { id: params.id } : {}),
     };
 
     const res = await createOrUpdateWallet(data);
@@ -63,9 +72,9 @@ const WalletModal = () => {
   };
 
   const onDelete = async () => {
-    if (!oldWallet?.id) return;
+    if (!params?.id) return;
     setLoading(true);
-    const res = await deleteWallet(oldWallet.id as string);
+    const res = await deleteWallet(params.id);
     setLoading(false);
     if (res.success) router.back();
     else Alert.alert("Wallet", res.msg);
@@ -86,7 +95,7 @@ const WalletModal = () => {
     <ModalWrapper>
       <View style={styles.container}>
         <Header
-          title={oldWallet?.id ? "Update Wallet" : "New Wallet"}
+          title={params?.id ? "Update Wallet" : "New Wallet"}
           leftIcon={<BackButton />}
           style={{ marginBottom: spacingY._10 }}
         />
@@ -106,6 +115,28 @@ const WalletModal = () => {
             </View>
 
             <View style={styles.divider} />
+
+            <View style={styles.inputGroup}>
+              <Typo size={14} color={colors.neutral700} fontWeight={"600"}>
+                Currency
+              </Typo>
+              <View style={styles.pickerWrap}>
+                <Picker
+                  selectedValue={wallet.currency}
+                  onValueChange={(val: CurrencyCode) =>
+                    setWallet((prev) => ({ ...prev, currency: val }))
+                  }
+                >
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <Picker.Item
+                      key={currency}
+                      label={currency}
+                      value={currency}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
 
             <View style={styles.inputGroup}>
               <Typo size={14} color={colors.neutral700} fontWeight={"600"}>
@@ -134,7 +165,7 @@ const WalletModal = () => {
           </View>
 
           <View style={styles.actions}>
-            {oldWallet?.id && !loading && (
+            {params?.id && !loading && (
               <Button style={styles.deleteBtn} onPress={showDeleteAlert}>
                 <Icons.Trash
                   color={colors.white}
@@ -149,7 +180,7 @@ const WalletModal = () => {
               style={styles.primaryBtn}
             >
               <Typo color={colors.black} fontWeight={"700"} size={18}>
-                {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
+                {params?.id ? "Update Wallet" : "Add Wallet"}
               </Typo>
             </Button>
           </View>
@@ -195,6 +226,13 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: colors.neutral200,
     marginVertical: spacingY._15,
+  },
+  pickerWrap: {
+    borderWidth: 1,
+    borderColor: colors.neutral300,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: colors.white,
   },
   uploadBox: {
     backgroundColor: colors.neutral100,

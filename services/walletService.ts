@@ -16,49 +16,49 @@ export const createOrUpdateWallet = async (
   walletData: Partial<WalletType>
 ): Promise<ResponseType> => {
   try {
-    // upload image
+    const { id, image, ...rest } = walletData;
 
-    let walletToSave = { ...walletData };
+    const payload: any = { ...rest };
 
-    if (walletData.image) {
+    if (image) {
       const imageUploadResponse = await uploadFileToCloudinary(
-        walletData.image,
+        image,
         "wallets"
       );
-
       if (!imageUploadResponse.success) {
         return {
           success: false,
           msg: imageUploadResponse.msg || "Failed to upload image",
         };
       }
-
-      walletToSave.image = imageUploadResponse.data;
+      payload.image = imageUploadResponse.data;
     }
 
-    if (!walletData.id) {
-      walletToSave.amount = 0;
-      walletToSave.totalIncome = 0;
-      walletToSave.totalExpenses = 0;
-      walletToSave.created = new Date();
+    const isCreate = !id;
+    if (isCreate) {
+      payload.amount = 0;
+      payload.totalIncome = 0;
+      payload.totalExpenses = 0;
+      payload.created = new Date();
     }
 
-    const walletRef = walletData.id
-      ? doc(firestore, "wallets", walletData.id)
+    Object.keys(payload).forEach((k) => {
+      if (payload[k] === undefined) delete payload[k];
+    });
+
+    const walletRef = id
+      ? doc(firestore, "wallets", id)
       : doc(collection(firestore, "wallets"));
 
-    await setDoc(walletRef, walletToSave, { merge: true });
+    await setDoc(walletRef, payload, { merge: true });
 
     return {
       success: true,
-      data: { ...walletToSave, id: walletRef.id },
+      data: { id: walletRef.id, ...payload },
     };
   } catch (error: any) {
     console.error("Error creating or updating wallet:", error);
-    return {
-      success: false,
-      msg: error.message,
-    };
+    return { success: false, msg: error.message };
   }
 };
 
