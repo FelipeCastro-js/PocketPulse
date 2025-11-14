@@ -16,6 +16,10 @@ export default function RootLayout() {
             name="(modals)/walletModal"
             options={{ presentation: "modal" }}
           />
+          <Stack.Screen
+            name="(modals)/searchModal"
+            options={{ presentation: "modal" }}
+          />
         </Stack>
       </SafeAreaProvider>
     </AuthProvider>

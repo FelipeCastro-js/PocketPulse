@@ -1,6 +1,6 @@
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { WalletType } from "@/types";
-import { formatNumber } from "@/utils/common";
+import { formatMoney } from "@/utils/money";
 import { verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
 import { Router } from "expo-router";
@@ -75,7 +75,7 @@ const WalletCard = ({
               {item.name}
             </Typo>
             <Typo size={13} color={colors.neutral500}>
-              USD {showBalance ? formatNumber(item?.amount || 0) : "****"}
+              {showBalance ? formatMoney(item?.amount || 0) : "COP ****"}
             </Typo>
           </View>
         </View>
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
     shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -127,18 +126,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.neutral300,
   },
-  avatar: {
-    height: "100%",
-    width: "100%",
-  },
+  avatar: { height: "100%", width: "100%" },
   avatarPlaceholder: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.primary,
   },
-  textBlock: {
-    flex: 1,
-    gap: 2,
-  },
+  textBlock: { flex: 1, gap: 2 },
 });

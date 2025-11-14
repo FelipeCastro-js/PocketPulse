@@ -1,13 +1,5 @@
-import { CurrencyCode } from "@/types";
+export type CurrencyCode = "COP";
 
-export const SUPPORTED_CURRENCIES: CurrencyCode[] = ["USD", "COP"];
-
-export const CURRENCY_SYMBOL: Record<CurrencyCode, string> = {
-  USD: "$",
-  COP: "$",
-};
-
-export const CURRENCY_LOCALE: Record<CurrencyCode, string> = {
-  USD: "en-US",
-  COP: "es-CO",
-};
+export const CURRENCY: CurrencyCode = "COP";
+export const CURRENCY_SYMBOL = "$";
+export const CURRENCY_LOCALE = "es-CO";

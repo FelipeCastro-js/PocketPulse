@@ -20,6 +20,8 @@ export const createOrUpdateWallet = async (
 
     const payload: any = { ...rest };
 
+    if (!payload.currency) payload.currency = "COP";
+
     if (image) {
       const imageUploadResponse = await uploadFileToCloudinary(
         image,

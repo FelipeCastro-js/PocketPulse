@@ -1,27 +1,33 @@
-import { CURRENCY_LOCALE } from "@/constants/currency";
-import { CurrencyCode } from "@/types";
+import { CURRENCY, CURRENCY_LOCALE } from "@/constants/currency";
 
 export const formatMoney = (
   value: number,
-  currency: CurrencyCode,
   opts: Intl.NumberFormatOptions = {}
-) => {
-  return new Intl.NumberFormat(CURRENCY_LOCALE[currency], {
+) =>
+  new Intl.NumberFormat(CURRENCY_LOCALE, {
     style: "currency",
-    currency,
-    minimumFractionDigits: currency === "COP" ? 0 : 2,
-    maximumFractionDigits: currency === "COP" ? 0 : 2,
+    currency: CURRENCY,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
     ...opts,
   }).format(value);
+
+export const formatCOP = (value: number | string = 0) => {
+  const n = Number(value || 0);
+  return new Intl.NumberFormat("es-CO", {
+    style: "decimal",
+    useGrouping: true,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n);
 };
 
-export const convertCurrency = (
-  amount: number,
-  from: CurrencyCode,
-  to: CurrencyCode,
-  rates: Record<CurrencyCode, number>
-) => {
-  if (from === to) return amount;
-
-  return amount * (rates[to] / rates[from]);
+export const formatCOPWithSymbol = (value: number | string = 0) => {
+  const n = Number(value || 0);
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n);
 };

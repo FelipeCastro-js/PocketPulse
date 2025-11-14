@@ -11,7 +11,6 @@ import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 import BackButton from "@/components/BackButton";
-import { SUPPORTED_CURRENCIES } from "@/constants/currency";
 import { useAuth } from "@/context/authContext";
 import { CurrencyCode, WalletType } from "@/types";
 import { Picker } from "@react-native-picker/picker";
@@ -22,7 +21,7 @@ const WalletModal = () => {
   const [wallet, setWallet] = useState<WalletType>({
     name: "",
     image: null,
-    currency: "USD",
+    currency: "COP",
   });
   const params = useLocalSearchParams() as {
     id?: string;
@@ -39,7 +38,7 @@ const WalletModal = () => {
       setWallet({
         name: params.name || "",
         image: params?.image || null,
-        currency: (params.currency as CurrencyCode) || "USD",
+        currency: "COP",
       });
     }
   }, [params?.id, params?.name, params?.image, params?.currency]);
@@ -61,7 +60,7 @@ const WalletModal = () => {
       uid: user?.uid,
       name: wallet.name.trim(),
       image: wallet.image,
-      currency: wallet.currency,
+      currency: "COP",
       ...(params.id ? { id: params.id } : {}),
     };
 
@@ -127,13 +126,7 @@ const WalletModal = () => {
                     setWallet((prev) => ({ ...prev, currency: val }))
                   }
                 >
-                  {SUPPORTED_CURRENCIES.map((currency) => (
-                    <Picker.Item
-                      key={currency}
-                      label={currency}
-                      value={currency}
-                    />
-                  ))}
+                  <Picker.Item label="COP" value="COP" />
                 </Picker>
               </View>
             </View>

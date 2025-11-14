@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-export type CurrencyCode = "USD" | "COP";
+export type CurrencyCode = "COP";
 
 export type ScreenWrapperProps = {
   style?: ViewStyle;
@@ -170,5 +170,5 @@ export type WalletType = {
   totalIncome?: number;
   totalExpenses?: number;
   created?: Date;
-  currency: CurrencyCode;
+  currency?: CurrencyCode;
 };
