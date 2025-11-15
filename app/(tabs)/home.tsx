@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import HomeCard from "@/components/HomeCard";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import TransactionList from "@/components/TransactionList";
 import Typo from "@/components/Typo";
 import { auth } from "@/config/firebase";
 import { colors, spacingX, spacingY } from "@/constants/theme";
@@ -66,16 +67,16 @@ const Home = () => {
             <HomeCard />
           </View>
 
-          {/* <TransactionList
+          <TransactionList
             title="Recent Transactions"
             loading={transactionsLoading}
             data={recentTransactions}
             emptyListMessage="No transactions yet"
-          /> */}
+          />
         </ScrollView>
 
         <Button
-          // onPress={() => router.push("/(modals)/transactionModal")}
+          onPress={() => router.push("/(modals)/transactionModal")}
           style={styles.floatingButton}
         >
           <Icons.Plus
