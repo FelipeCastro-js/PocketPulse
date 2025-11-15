@@ -80,7 +80,7 @@ const Home = () => {
           style={styles.floatingButton}
         >
           <Icons.Plus
-            color={colors.black}
+            color={colors.white}
             weight="bold"
             size={verticalScale(24)}
           />

@@ -26,10 +26,10 @@ export default BackButton;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.neutral600,
+    backgroundColor: colors.primary,
     alignSelf: "flex-start",
-    borderRadius: radius._12,
+    borderRadius: radius._30,
     borderCurve: "continuous",
-    padding: 5,
+    padding: 6,
   },
 });

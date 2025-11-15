@@ -172,7 +172,7 @@ const WalletModal = () => {
               loading={loading}
               style={styles.primaryBtn}
             >
-              <Typo color={colors.black} fontWeight={"700"} size={18}>
+              <Typo color={colors.white} fontWeight={"700"} size={18}>
                 {params?.id ? "Update Wallet" : "Add Wallet"}
               </Typo>
             </Button>

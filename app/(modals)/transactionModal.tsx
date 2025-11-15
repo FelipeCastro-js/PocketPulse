@@ -268,14 +268,14 @@ const TransactionModal = () => {
                 </Pressable>
               )}
               {showDatePicker && (
-                <View style={Platform.OS === "ios" && styles.iosDatePicker}>
+                <View style={Platform.OS === "android" && styles.iosDatePicker}>
                   <DateTimePicker
                     value={transaction.date as Date}
                     mode="date"
-                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                    display={Platform.OS === "android" ? "spinner" : "default"}
                     onChange={onDateChange}
                   />
-                  {Platform.OS === "ios" && (
+                  {Platform.OS === "android" && (
                     <TouchableOpacity
                       style={styles.datePickerButton}
                       onPress={() => setShowDatePicker(false)}
@@ -380,7 +380,7 @@ const TransactionModal = () => {
         )}
 
         <Button loading={loading} onPress={onSubmit} style={{ flex: 1 }}>
-          <Typo color={colors.black} size={18} fontWeight="800">
+          <Typo color={colors.white} size={18} fontWeight="800">
             {oldTransaction?.id ? "Update" : "Submit"}
           </Typo>
         </Button>
