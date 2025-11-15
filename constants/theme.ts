@@ -32,6 +32,7 @@ export const spacingX = {
   _3: scale(3),
   _5: scale(5),
   _7: scale(7),
+  _8: scale(8),
   _10: scale(10),
   _12: scale(12),
   _15: scale(15),

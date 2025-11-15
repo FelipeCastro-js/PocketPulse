@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     width: verticalScale(50),
     borderRadius: 100,
     position: "absolute",
-    bottom: verticalScale(30),
+    bottom: verticalScale(105),
     right: verticalScale(30),
   },
 
