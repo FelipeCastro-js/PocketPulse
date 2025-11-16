@@ -24,11 +24,108 @@ import {
 } from "@/services/transactionService";
 import { buildNiceYAxis } from "@/utils/axis";
 import { scale, verticalScale } from "@/utils/styling";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 
 const { width: screenWidth } = Dimensions.get("window");
 
 type AnyObj = Record<string, any>;
+
+type GiftedBar = {
+  value: number;
+  label?: string;
+  frontColor?: string;
+  spacing?: number;
+  labelWidth?: number;
+};
+type WeeklyRow = { label: string; income?: number; expense?: number };
+
+function normalizeWeeklyChartData(input: Array<GiftedBar | WeeklyRow>) {
+  const BAR = scale(12);
+  const INNER = scale(8);
+  const GROUP = scale(26);
+  const groupWidth = BAR * 2 + INNER;
+
+  const isGifted =
+    Array.isArray(input) &&
+    input.length > 0 &&
+    (input[0] as any).value !== undefined;
+
+  if (isGifted) {
+    const out: GiftedBar[] = [];
+    let lastLabel: string | undefined;
+    for (let i = 0; i < input.length; i++) {
+      const item = input[i] as GiftedBar;
+      const labelChanged = item.label && item.label !== lastLabel;
+
+      out.push({
+        ...item,
+
+        labelWidth: labelChanged ? groupWidth : item.labelWidth,
+
+        spacing: labelChanged ? INNER : GROUP,
+      });
+
+      if (item.label) lastLabel = item.label;
+    }
+
+    return {
+      data: out,
+      barWidth: BAR,
+      initialSpacing: GROUP / 2,
+      endSpacing: GROUP / 2,
+    };
+  }
+
+  const rows = input as WeeklyRow[];
+  const out: GiftedBar[] = [];
+
+  for (const row of rows) {
+    const incomeVal = Number(row.income ?? 0);
+    const expenseVal = Number(row.expense ?? 0);
+    const hasIncome = incomeVal > 0;
+    const hasExpense = expenseVal > 0;
+
+    if (hasIncome && hasExpense) {
+      out.push({
+        value: incomeVal,
+        label: row.label,
+        labelWidth: groupWidth,
+        frontColor: colors.primary,
+        spacing: INNER,
+      });
+      out.push({
+        value: expenseVal,
+        frontColor: colors.rose,
+        spacing: GROUP,
+      });
+    } else if (hasIncome || hasExpense) {
+      const onlyVal = hasIncome ? incomeVal : expenseVal;
+      const onlyColor = hasIncome ? colors.primary : colors.rose;
+      out.push({
+        value: onlyVal,
+        label: row.label,
+        labelWidth: groupWidth,
+        frontColor: onlyColor,
+        spacing: GROUP,
+      });
+    } else {
+      out.push({
+        value: 0,
+        label: row.label,
+        labelWidth: groupWidth,
+        frontColor: "transparent",
+        spacing: GROUP,
+      });
+    }
+  }
+
+  return {
+    data: out,
+    barWidth: BAR,
+    initialSpacing: GROUP / 2,
+    endSpacing: GROUP / 2,
+  };
+}
 
 function normalizeChartData(raw: AnyObj[] = []) {
   if (!raw?.length) return [];
@@ -111,6 +208,13 @@ const Statistics = () => {
     }
   };
 
+  const weeklyNormalized = useMemo(
+    () => normalizeWeeklyChartData(chartRaw as any[]),
+    [chartRaw]
+  );
+
+  const chartData = useMemo(() => normalizeChartData(chartRaw), [chartRaw]);
+
   const refetchCurrent = useCallback(() => {
     if (!user?.uid) return;
     if (activeIndex === 0) return void getWeeklyStats();
@@ -134,7 +238,14 @@ const Statistics = () => {
     setRefreshing(false);
   }, [refetchCurrent]);
 
-  const chartData = useMemo(() => normalizeChartData(chartRaw), [chartRaw]);
+  const {
+    data: dataWeekly,
+    barWidth,
+    initialSpacing,
+    endSpacing,
+  } = weeklyNormalized;
+
+  const dataForChart = activeIndex === 0 ? dataWeekly : chartData;
 
   const barSpacing = useMemo(
     () => ([1, 2].includes(activeIndex) ? scale(24) : scale(16)),
@@ -144,7 +255,7 @@ const Statistics = () => {
 
   const sections = 3;
   const { maxValue, stepValue, yAxisLabelTexts } = buildNiceYAxis(
-    chartData as Array<{ value: number }>,
+    dataForChart as Array<{ value: number }>,
     sections
   );
 
@@ -219,11 +330,15 @@ const Statistics = () => {
             </View>
 
             <View style={styles.chartArea}>
-              {chartData.length > 0 ? (
+              {dataForChart.length > 0 ? (
                 <BarChart
-                  data={chartData}
-                  barWidth={scale(12)}
-                  spacing={barSpacing}
+                  data={dataForChart}
+                  barWidth={activeIndex === 0 ? barWidth : scale(12)}
+                  spacing={activeIndex === 0 ? undefined : barSpacing}
+                  initialSpacing={
+                    activeIndex === 0 ? initialSpacing : undefined
+                  }
+                  endSpacing={activeIndex === 0 ? endSpacing : undefined}
                   roundedTop
                   roundedBottom
                   hideRules

@@ -6,7 +6,7 @@ import { Text, TextStyle } from "react-native";
 
 const Typo = ({
   size,
-  color = colors.text,
+  color = colors.black,
   fontWeight = "400",
   children,
   style,
