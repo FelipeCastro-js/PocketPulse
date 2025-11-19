@@ -7,7 +7,7 @@ import { scale, verticalScale } from "@/utils/styling";
 import { LinearGradient } from "expo-linear-gradient";
 import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
-import * as React from "react";
+import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Typo from "./Typo";
 
@@ -24,9 +24,7 @@ const HomeCard = () => {
   const { data: wallets, loading: walletLoading } = useFetchData<WalletType>(
     "wallets",
     walletConstraints,
-    {
-      enabled: !!uid,
-    }
+    { enabled: !!uid }
   );
 
   const totals = React.useMemo(() => {
@@ -47,27 +45,28 @@ const HomeCard = () => {
   return (
     <View style={styles.shadowWrap}>
       <LinearGradient
-        colors={["#00B7A5", colors.primary]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
+        colors={[colors.primaryDark, colors.primary]}
+        start={{ x: 0, y: 0.4 }}
+        end={{ x: 1, y: 0.6 }}
         style={styles.card}
       >
+        {/* Cabecera dentro de la tarjeta */}
         <View style={styles.topRow}>
-          <Typo size={14} color={"#FFFFFFCC"} fontWeight="600">
-            Balance
+          <Typo size={14} color={"#FFFFFFCC"} fontWeight="700">
+            Total Balance
           </Typo>
 
           <TouchableOpacity onPress={() => setShowBalance((v) => !v)}>
             {showBalance ? (
               <Icons.Eye
-                size={verticalScale(20)}
-                color={"#FFFFFF"}
+                size={verticalScale(22)}
+                color={colors.white}
                 weight="fill"
               />
             ) : (
               <Icons.EyeSlash
-                size={verticalScale(20)}
-                color={"#FFFFFF"}
+                size={verticalScale(22)}
+                color={colors.white}
                 weight="fill"
               />
             )}
@@ -77,8 +76,8 @@ const HomeCard = () => {
         <Typo
           size={34}
           fontWeight="800"
-          color={"#FFFFFF"}
-          style={{ marginTop: 2 }}
+          color={colors.white}
+          style={{ marginTop: spacingY._7 }}
         >
           {walletLoading
             ? "----"
@@ -95,15 +94,15 @@ const HomeCard = () => {
               <View style={styles.pillLight}>
                 <Icons.ArrowDown
                   size={verticalScale(14)}
-                  color={"#0B0F0E"}
+                  color={colors.text}
                   weight="bold"
                 />
               </View>
-              <Typo size={14} color={"#FFFFFFE6"} fontWeight="700">
+              <Typo size={15} color={"#FFFFFFE6"} fontWeight="700">
                 Income
               </Typo>
             </View>
-            <Typo size={16} fontWeight="800" color={"#FFFFFF"}>
+            <Typo size={16} fontWeight="800" color={colors.white}>
               {walletLoading
                 ? "----"
                 : showBalance
@@ -112,28 +111,22 @@ const HomeCard = () => {
             </Typo>
           </View>
 
-          <View
-            style={{
-              width: 1,
-              height: scale(36),
-              backgroundColor: "#FFFFFF33",
-            }}
-          />
+          <View style={styles.divider} />
 
           <View style={styles.statBox}>
             <View style={styles.labelRow}>
               <View style={styles.pillLight}>
                 <Icons.ArrowUp
                   size={verticalScale(14)}
-                  color={"#0B0F0E"}
+                  color={colors.text}
                   weight="bold"
                 />
               </View>
-              <Typo size={14} color={"#FFFFFFE6"} fontWeight="700">
-                Expense
+              <Typo size={15} color={"#FFFFFFE6"} fontWeight="700">
+                Expenses
               </Typo>
             </View>
-            <Typo size={16} fontWeight="800" color={"#FFFFFF"}>
+            <Typo size={16} fontWeight="800" color={colors.white}>
               {walletLoading
                 ? "----"
                 : showBalance
@@ -151,17 +144,19 @@ export default HomeCard;
 
 const styles = StyleSheet.create({
   shadowWrap: {
-    borderRadius: radius._15,
+    borderRadius: radius._20,
     shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    shadowOpacity: 0.25,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 10,
   },
   card: {
-    borderRadius: radius._15,
+    borderRadius: radius._20,
     borderCurve: "continuous" as any,
-    padding: spacingX._20,
+    paddingHorizontal: spacingX._20,
+    paddingTop: spacingY._17,
+    paddingBottom: spacingY._15,
   },
   topRow: {
     flexDirection: "row",
@@ -170,7 +165,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: "#FFFFFF33",
+    backgroundColor: "rgba(255,255,255,0.25)",
     marginVertical: spacingY._12,
   },
   bottomRow: {
@@ -193,6 +188,11 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
+  },
+  divider: {
+    width: 1,
+    height: scale(36),
+    backgroundColor: "rgba(255,255,255,0.25)",
   },
 });

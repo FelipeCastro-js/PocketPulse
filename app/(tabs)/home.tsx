@@ -4,11 +4,12 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import TransactionList from "@/components/TransactionList";
 import Typo from "@/components/Typo";
 import { auth } from "@/config/firebase";
-import { colors, spacingX, spacingY } from "@/constants/theme";
+import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/context/authContext";
 import useFetchData from "@/hooks/useFetchData";
 import { TransactionType } from "@/types";
-import { verticalScale } from "@/utils/styling";
+import { scale, verticalScale } from "@/utils/styling";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { limit, orderBy, where } from "firebase/firestore";
@@ -21,13 +22,13 @@ const Home = () => {
   const router = useRouter();
   const uid = user?.uid;
 
-  const contraints = useMemo(() => {
+  const constraints = useMemo(() => {
     if (!uid) return null;
     return [where("uid", "==", uid), orderBy("date", "desc"), limit(30)];
   }, [uid]);
 
   const { data: recentTransactions, loading: transactionsLoading } =
-    useFetchData<TransactionType>("transactions", contraints, {
+    useFetchData<TransactionType>("transactions", constraints, {
       enabled: !!uid,
     });
 
@@ -36,41 +37,61 @@ const Home = () => {
   };
 
   return (
-    <ScreenWrapper style={{ backgroundColor: colors.black }}>
+    <ScreenWrapper style={{ backgroundColor: colors.neutral100 }}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={{ gap: 4 }}>
-            <Typo size={16} color={colors.neutral400}>
-              Hello,
-            </Typo>
-            <Typo fontWeight="700" size={20} color={colors.white}>
-              {user?.name || " "}
-            </Typo>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => router.push("/(modals)/searchModal")}
-            style={styles.searchIcon}
-            activeOpacity={0.85}
+        <View style={styles.heroWrap}>
+          <LinearGradient
+            colors={[colors.primaryDark, colors.primary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.heroGradient}
           >
-            <Icons.MagnifyingGlass
-              size={verticalScale(20)}
-              color={colors.neutral200}
-              weight="bold"
-            />
-          </TouchableOpacity>
+            <View style={styles.topBar}>
+              <View>
+                <Typo size={16} color={colors.white}>
+                  Hello,
+                </Typo>
+                <Typo size={22} fontWeight="800" color={colors.white}>
+                  {user?.name || " "}
+                </Typo>
+              </View>
+              <View style={{ width: verticalScale(34) }} />
+              <TouchableOpacity
+                onPress={() => router.push("/(modals)/searchModal")}
+                style={styles.searchIcon}
+                activeOpacity={0.85}
+              >
+                <Icons.MagnifyingGlass
+                  size={verticalScale(20)}
+                  color={colors.white}
+                  weight="bold"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View pointerEvents="none" style={styles.rings}>
+              <View style={[styles.ring, { width: 280, height: 280 }]} />
+              <View style={[styles.ring, { width: 200, height: 200 }]} />
+              <View style={[styles.ring, { width: 140, height: 140 }]} />
+            </View>
+          </LinearGradient>
+
+          <View style={styles.cardHolder}>
+            <HomeCard />
+          </View>
         </View>
 
         <ScrollView
           contentContainerStyle={styles.scrollViewStyle}
           showsVerticalScrollIndicator={false}
         >
-          <View>
-            <HomeCard />
+          <View style={styles.sectionHeader}>
+            <Typo size={20} fontWeight="800" color={colors.text}>
+              Transactions History
+            </Typo>
           </View>
 
           <TransactionList
-            title="Recent Transactions"
             loading={transactionsLoading}
             data={recentTransactions}
             emptyListMessage="No transactions yet"
@@ -97,32 +118,67 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacingX._20,
-    marginTop: verticalScale(8),
+    backgroundColor: colors.neutral100,
   },
-  header: {
+
+  heroWrap: {
+    position: "relative",
+    backgroundColor: colors.neutral100,
+  },
+  heroGradient: {
+    height: verticalScale(190),
+    paddingTop: spacingY._10,
+    paddingHorizontal: spacingX._20,
+    borderBottomLeftRadius: radius._30,
+    borderBottomRightRadius: radius._30,
+    borderCurve: "continuous" as any,
+    overflow: "hidden",
+  },
+  topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacingY._10,
+    zIndex: 1,
   },
   searchIcon: {
-    backgroundColor: colors.neutral700,
+    backgroundColor: "rgba(255,255,255,0.22)",
     padding: spacingX._10,
     borderRadius: 50,
   },
-  floatingButton: {
-    height: verticalScale(50),
-    width: verticalScale(50),
-    borderRadius: 100,
+  rings: {
     position: "absolute",
-    bottom: verticalScale(105),
-    right: verticalScale(30),
+    right: -40,
+    top: 10,
+    opacity: 0.18,
+  },
+  ring: {
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
+    borderRadius: 999,
+    marginVertical: scale(14),
+  },
+
+  cardHolder: {
+    marginTop: verticalScale(-36),
+    paddingHorizontal: spacingX._20,
+  },
+
+  sectionHeader: {
+    paddingHorizontal: spacingX._20,
+    paddingTop: spacingY._20,
+    paddingBottom: spacingY._7,
   },
 
   scrollViewStyle: {
-    marginTop: spacingY._10,
-    paddingBottom: verticalScale(100),
-    gap: spacingY._25,
+    paddingBottom: verticalScale(110),
+  },
+
+  floatingButton: {
+    height: verticalScale(56),
+    width: verticalScale(56),
+    borderRadius: 999,
+    position: "absolute",
+    bottom: verticalScale(98),
+    right: verticalScale(24),
   },
 });
