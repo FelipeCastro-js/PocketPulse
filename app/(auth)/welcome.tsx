@@ -1,119 +1,182 @@
-// app/auth/welcome.tsx
-import Button from "@/components/Button";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, useRouter } from "expo-router";
+import React from "react";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInUp,
+} from "react-native-reanimated";
+
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
-import { colors, spacingX, spacingY } from "@/constants/theme";
-import { verticalScale } from "@/utils/styling";
-import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { colors, radius, spacingX, spacingY } from "@/constants/theme";
+import { scale, verticalScale } from "@/utils/styling";
 
-const WelcomePage = () => {
+const { width, height } = Dimensions.get("window");
+
+export default function Welcome() {
   const router = useRouter();
+
   return (
-    <ScreenWrapper>
-      <StatusBar style="light" />
+    <ScreenWrapper style={{ backgroundColor: colors.neutral100 }}>
       <View style={styles.container}>
-        {/* login & image */}
-        <View>
+        <Animated.View
+          entering={FadeIn.duration(500)}
+          style={styles.signInWrap}
+        >
           <TouchableOpacity
             onPress={() => router.push("/login")}
-            style={styles.loginButton}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Typo fontWeight={"500"}>Sign in</Typo>
+            <Typo size={16} color={colors.text} fontWeight="700">
+              Sign in
+            </Typo>
           </TouchableOpacity>
+        </Animated.View>
 
-          <Animated.View entering={FadeIn.duration(500)}>
-            <Image
-              source={require("../../assets/images/welcome.png")}
-              style={styles.welcomeImage}
-              resizeMode="contain"
-            />
-          </Animated.View>
+        <View pointerEvents="none" style={styles.rings}>
+          <View
+            style={[styles.ring, { width: width * 1.1, height: width * 1.1 }]}
+          />
+          <View
+            style={[styles.ring, { width: width * 0.9, height: width * 0.9 }]}
+          />
+          <View
+            style={[styles.ring, { width: width * 0.7, height: width * 0.7 }]}
+          />
         </View>
 
-        <View style={styles.footer}>
-          <Animated.View
-            entering={FadeInDown.duration(1000).springify().damping(12)}
-            style={{ alignItems: "center" }}
-          >
-            <Typo size={30} fontWeight={"800"}>
-              Always take control
-            </Typo>
-            <Typo size={30} fontWeight={"800"}>
-              of your finances
-            </Typo>
-          </Animated.View>
+        <Animated.View
+          entering={FadeInUp.duration(700).springify().damping(12)}
+          style={styles.heroWrap}
+        >
+          <Image
+            source={require("@/assets/images/welcome1.png")}
+            style={styles.hero}
+            contentFit="contain"
+            transition={200}
+          />
+        </Animated.View>
 
-          <Animated.View
-            entering={FadeInDown.duration(1000)
-              .delay(100)
-              .springify()
-              .damping(12)}
-            style={{ alignItems: "center", gap: 2 }}
+        <Animated.View
+          entering={FadeInDown.duration(800).delay(80).springify().damping(12)}
+          style={styles.copy}
+        >
+          <Typo
+            size={32}
+            fontWeight="900"
+            color={colors.text}
+            style={{ textAlign: "center", lineHeight: verticalScale(38) }}
           >
-            <Typo size={17} color={colors.textLighter}>
-              Finances must be arranged to set a better
-            </Typo>
-            <Typo size={17} color={colors.textLighter}>
-              lifestyle in future
-            </Typo>
-          </Animated.View>
+            Spend Smarter{"\n"}Save More
+          </Typo>
+        </Animated.View>
 
-          <Animated.View
-            entering={FadeInDown.duration(1000)
-              .delay(200)
-              .springify()
-              .damping(12)}
-            style={styles.buttonContainer}
+        <Animated.View
+          entering={FadeInDown.duration(800).delay(160).springify().damping(12)}
+          style={styles.actions}
+        >
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push("/register")}
           >
-            <Button onPress={() => router.push("/register")}>
-              <Typo size={22} color={colors.white} fontWeight={"600"}>
+            <LinearGradient
+              colors={[colors.primaryDark, colors.primary]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.cta}
+            >
+              <Typo size={20} fontWeight="900" color={colors.white}>
                 Get Started
               </Typo>
-            </Button>
-          </Animated.View>
-        </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <Typo
+            size={14}
+            color={colors.textLighter}
+            style={{ marginTop: spacingY._10, alignSelf: "center" }}
+          >
+            Already Have Account?{" "}
+            <Link
+              href="/login"
+              style={{ color: colors.primary, fontWeight: "800" }}
+            >
+              Log In
+            </Link>
+          </Typo>
+        </Animated.View>
+
+        <View style={{ height: verticalScale(10) }} />
       </View>
     </ScreenWrapper>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
-    paddingTop: spacingY._7,
-  },
-  welcomeImage: {
-    width: "100%",
-    height: verticalScale(300),
-    alignSelf: "center",
-    marginTop: verticalScale(100),
-  },
-  loginButton: {
-    alignSelf: "flex-end",
-    marginRight: spacingX._20,
-  },
-  footer: {
-    backgroundColor: colors.neutral100,
+    paddingTop: spacingY._20,
+    paddingHorizontal: spacingX._20,
     alignItems: "center",
-    paddingTop: verticalScale(30),
-    paddingBottom: verticalScale(45),
-    gap: spacingY._20,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: -10 },
-    elevation: 10,
-    shadowRadius: 25,
-    shadowOpacity: 0.15,
+
+    justifyContent: "flex-start",
   },
-  buttonContainer: {
+
+  signInWrap: {
+    alignSelf: "stretch",
+    alignItems: "flex-end",
+  },
+
+  rings: {
+    position: "absolute",
+    top: verticalScale(0),
+    alignSelf: "center",
+    opacity: 0.55,
+  },
+  ring: {
+    borderWidth: 1,
+    borderColor: "#E9F4EF",
+    borderRadius: 999,
+    alignSelf: "center",
+    marginVertical: scale(20),
+  },
+
+  heroWrap: {
     width: "100%",
-    paddingHorizontal: spacingX._25,
+    alignItems: "center",
+    marginTop: spacingY._10,
+  },
+  hero: {
+    width: "100%",
+    height: Math.min(verticalScale(380), height * 0.45),
+  },
+
+  copy: {
+    marginTop: spacingY._10,
+    marginBottom: spacingY._5,
+    paddingHorizontal: spacingX._10,
+  },
+
+  actions: {
+    width: "100%",
+    marginTop: spacingY._10,
+    marginBottom: spacingY._20,
+  },
+
+  cta: {
+    width: "100%",
+    height: verticalScale(60),
+    borderRadius: radius._30,
+    borderCurve: "continuous" as any,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: colors.neutral900,
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
   },
 });
-
-export default WelcomePage;

@@ -1,4 +1,3 @@
-// components/Button.tsx
 import { colors, radius } from "@/constants/theme";
 import { CustomButtonProps } from "@/types";
 import { verticalScale } from "@/utils/styling";

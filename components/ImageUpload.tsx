@@ -1,4 +1,3 @@
-// ImageUpload.tsx
 import { colors, radius } from "@/constants/theme";
 import { getFilePath } from "@/services/imageService";
 import { scale, verticalScale } from "@/utils/styling";
