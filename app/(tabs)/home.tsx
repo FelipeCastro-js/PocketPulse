@@ -13,21 +13,23 @@ import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { limit, orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const uid = user?.uid;
 
-  const contraints = [
-    where("uid", "==", user?.uid),
-    orderBy("date", "desc"),
-    limit(30),
-  ];
+  const contraints = useMemo(() => {
+    if (!uid) return null;
+    return [where("uid", "==", uid), orderBy("date", "desc"), limit(30)];
+  }, [uid]);
 
   const { data: recentTransactions, loading: transactionsLoading } =
-    useFetchData<TransactionType>("transactions", contraints);
+    useFetchData<TransactionType>("transactions", contraints, {
+      enabled: !!uid,
+    });
 
   const logout = async () => {
     await signOut(auth);

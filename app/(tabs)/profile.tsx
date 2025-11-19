@@ -32,28 +32,28 @@ const Profile = () => {
       routeName: "/profileModa",
       bgColor: "#6366f1",
     },
-    {
-      title: "Settings",
-      icon: (
-        <Icons.GearSix
-          size={verticalScale(26)}
-          color={colors.white}
-          weight="fill"
-        />
-      ),
-      bgColor: "#059669",
-    },
-    {
-      title: "Privacy Policy",
-      icon: (
-        <Icons.Lock
-          size={verticalScale(26)}
-          color={colors.white}
-          weight="fill"
-        />
-      ),
-      bgColor: colors.neutral600,
-    },
+    // {
+    //   title: "Settings",
+    //   icon: (
+    //     <Icons.GearSix
+    //       size={verticalScale(26)}
+    //       color={colors.white}
+    //       weight="fill"
+    //     />
+    //   ),
+    //   bgColor: "#059669",
+    // },
+    // {
+    //   title: "Privacy Policy",
+    //   icon: (
+    //     <Icons.Lock
+    //       size={verticalScale(26)}
+    //       color={colors.white}
+    //       weight="fill"
+    //     />
+    //   ),
+    //   bgColor: colors.neutral600,
+    // },
     {
       title: "Logout",
       icon: (
@@ -70,6 +70,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await signOut(auth);
+    router.replace("/(auth)/login");
   };
 
   const showLogoutAlert = () => {

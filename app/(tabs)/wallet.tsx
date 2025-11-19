@@ -18,21 +18,20 @@ import { orderBy, where } from "firebase/firestore";
 const Wallet = () => {
   const router = useRouter();
   const { user } = useAuth();
+  const uid = user?.uid;
 
   const [showBalance, setShowBalance] = useState<boolean>(false);
   const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>("COP");
 
-  const constraints = useMemo(
-    () => [
-      where("uid", "==", user?.uid || "__none__"),
-      orderBy("created", "desc"),
-    ],
-    [user?.uid]
-  );
+  const constraints = useMemo(() => {
+    if (!uid) return null;
+    return [where("uid", "==", uid), orderBy("created", "desc")];
+  }, [uid]);
 
   const { data: wallets, loading } = useFetchData<WalletType>(
     "wallets",
-    constraints
+    constraints,
+    { enabled: !!uid }
   );
 
   const totalBalance = useMemo(

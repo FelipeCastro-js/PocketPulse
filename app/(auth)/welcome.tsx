@@ -71,7 +71,7 @@ const WelcomePage = () => {
             style={styles.buttonContainer}
           >
             <Button onPress={() => router.push("/register")}>
-              <Typo size={22} color={colors.black} fontWeight={"600"}>
+              <Typo size={22} color={colors.white} fontWeight={"600"}>
                 Get Started
               </Typo>
             </Button>

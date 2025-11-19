@@ -99,7 +99,7 @@ const SignUp = () => {
 
           {/* button */}
           <Button loading={loading} onPress={onSubmit}>
-            <Typo fontWeight={"700"} color={colors.black} size={21}>
+            <Typo fontWeight={"700"} color={colors.white} size={21}>
               Sign Up
             </Typo>
           </Button>

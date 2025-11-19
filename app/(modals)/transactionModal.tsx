@@ -20,7 +20,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Platform,
@@ -55,6 +55,7 @@ const Card: React.FC<{
 const TransactionModal = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const uid = user?.uid;
 
   type ParamType = {
     id?: string;
@@ -69,10 +70,18 @@ const TransactionModal = () => {
   };
   const oldTransaction: ParamType = useLocalSearchParams();
 
-  const { data: wallets } = useFetchData<WalletType>("wallets", [
-    where("uid", "==", user?.uid),
-    orderBy("created", "desc"),
-  ]);
+  const walletConstraints = useMemo(() => {
+    if (!uid) return null;
+    return [where("uid", "==", uid), orderBy("created", "desc")];
+  }, [uid]);
+
+  const { data: wallets } = useFetchData<WalletType>(
+    "wallets",
+    walletConstraints,
+    {
+      enabled: !!uid,
+    }
+  );
 
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -117,6 +126,11 @@ const TransactionModal = () => {
     const { type, amount, category, date, walletId, image, description } =
       transaction;
 
+    if (!uid) {
+      Alert.alert("Transaction", "You must be logged in.");
+      return;
+    }
+
     if (!walletId || !date || !amount || (type === "expense" && !category)) {
       Alert.alert("Transaction", "Please fill all the fields");
       return;
@@ -130,7 +144,7 @@ const TransactionModal = () => {
       date,
       walletId,
       image,
-      uid: user?.uid,
+      uid,
       currency: "COP",
       ...(oldTransaction?.id ? { id: oldTransaction.id } : {}),
     };

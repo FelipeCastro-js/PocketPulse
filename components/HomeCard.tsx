@@ -14,10 +14,19 @@ import Typo from "./Typo";
 const HomeCard = () => {
   const { user } = useAuth();
   const [showBalance, setShowBalance] = React.useState(false);
+  const uid = user?.uid;
+
+  const walletConstraints = React.useMemo(() => {
+    if (!uid) return null;
+    return [where("uid", "==", uid), orderBy("created", "desc")];
+  }, [uid]);
 
   const { data: wallets, loading: walletLoading } = useFetchData<WalletType>(
     "wallets",
-    [where("uid", "==", user?.uid), orderBy("created", "desc")]
+    walletConstraints,
+    {
+      enabled: !!uid,
+    }
   );
 
   const totals = React.useMemo(() => {
