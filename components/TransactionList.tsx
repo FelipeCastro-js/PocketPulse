@@ -11,7 +11,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Timestamp } from "firebase/firestore";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import Loading from "./Loading";
 import Typo from "./Typo";
@@ -98,16 +98,13 @@ const TransactionItem = ({
 
   const date = (item?.date as Timestamp)
     ?.toDate()
-    ?.toLocaleDateString("es-CO", {
-      day: "2-digit",
-      month: "short",
-    });
+    ?.toLocaleDateString("es-CO", { day: "2-digit", month: "short" });
 
-  const amountStr = formatMoney(Math.abs(item?.amount || 0), {
-    currency: "COP",
-  });
+  const amountAbs = Math.abs(item?.amount || 0);
+  const amountStr = formatMoney(amountAbs, { currency: "COP" });
   const sign = item?.type === "income" ? "+" : "-";
-  const amountColor = item?.type === "income" ? colors.primary : colors.rose;
+  const defaultAmountColor =
+    item?.type === "income" ? colors.green : colors.rose;
 
   return (
     <Animated.View
@@ -115,46 +112,51 @@ const TransactionItem = ({
         .springify()
         .damping(14)}
     >
-      <TouchableOpacity style={styles.row} onPress={() => handleClick(item)}>
-        <View
-          style={[
-            styles.icon,
-            { backgroundColor: category?.bgColor || colors.neutral500 },
-          ]}
-        >
-          {!!IconComponent && (
-            <IconComponent
-              size={verticalScale(22)}
-              weight="fill"
-              color={colors.white}
-            />
-          )}
-        </View>
+      <Pressable
+        onPress={() => handleClick(item)}
+        style={({ pressed }) => [styles.rowBase, pressed && styles.rowPressed]}
+      >
+        {({ pressed }) => {
+          const fg = pressed ? colors.white : colors.text;
+          const sub = pressed ? "#FFFFFFCC" : colors.neutral500;
+          const amountColor = pressed ? colors.white : defaultAmountColor;
+          const pillBg = pressed ? colors.white : category?.bgColor;
 
-        <View style={styles.categoryDes}>
-          <Typo size={16} fontWeight="600" color={colors.text}>
-            {category?.label || "Uncategorized"}
-          </Typo>
-          {!!item?.description && (
-            <Typo
-              size={12}
-              color={colors.neutral500}
-              textProps={{ numberOfLines: 1 }}
-            >
-              {item.description}
-            </Typo>
-          )}
-        </View>
+          return (
+            <>
+              <View style={[styles.icon, { backgroundColor: pillBg }]}>
+                {!!IconComponent && (
+                  <IconComponent
+                    size={verticalScale(22)}
+                    weight="fill"
+                    color={pressed ? colors.text : colors.white}
+                  />
+                )}
+              </View>
 
-        <View style={styles.amountDate}>
-          <Typo fontWeight="700" color={amountColor}>
-            {`${sign} ${amountStr}`}
-          </Typo>
-          <Typo size={12} color={colors.neutral500}>
-            {date}
-          </Typo>
-        </View>
-      </TouchableOpacity>
+              <View style={styles.categoryDes}>
+                <Typo size={16} fontWeight="600" color={fg}>
+                  {category?.label || "Uncategorized"}
+                </Typo>
+                {!!item?.description && (
+                  <Typo size={12} color={sub} textProps={{ numberOfLines: 1 }}>
+                    {item.description}
+                  </Typo>
+                )}
+              </View>
+
+              <View style={styles.amountDate}>
+                <Typo fontWeight="800" color={amountColor}>
+                  {`${sign} ${amountStr}`}
+                </Typo>
+                <Typo size={12} color={sub}>
+                  {date}
+                </Typo>
+              </View>
+            </>
+          );
+        }}
+      </Pressable>
     </Animated.View>
   );
 };
@@ -162,30 +164,33 @@ const TransactionItem = ({
 export default TransactionList;
 
 const styles = StyleSheet.create({
-  container: {
-    gap: spacingY._17,
-  },
-  list: {
-    minHeight: 3,
-  },
-  row: {
+  container: { gap: spacingY._17 },
+  list: { minHeight: 3 },
+
+  rowBase: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacingX._12,
     marginBottom: spacingY._12,
     backgroundColor: colors.white,
-    borderRadius: radius._17,
-    borderCurve: "continuous" as any,
-    borderWidth: 1,
-    borderColor: colors.neutral200,
-    paddingVertical: spacingY._10,
-    paddingHorizontal: spacingX._12,
+    borderRadius: 0,
+    borderWidth: 0,
+    paddingVertical: spacingY._12,
+    paddingHorizontal: spacingX._15,
     shadowColor: colors.neutral900,
     shadowOpacity: 0.06,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
+    elevation: 2,
   },
+
+  rowPressed: {
+    backgroundColor: colors.primary,
+    elevation: 6,
+    shadowOpacity: 0.12,
+    transform: [{ scale: 0.995 }],
+  },
+
   icon: {
     height: verticalScale(44),
     aspectRatio: 1,
@@ -194,12 +199,6 @@ const styles = StyleSheet.create({
     borderRadius: radius._12,
     borderCurve: "continuous" as any,
   },
-  categoryDes: {
-    flex: 1,
-    gap: 2,
-  },
-  amountDate: {
-    alignItems: "flex-end",
-    gap: 2,
-  },
+  categoryDes: { flex: 1, gap: 2 },
+  amountDate: { alignItems: "flex-end", gap: 2 },
 });
