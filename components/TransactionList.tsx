@@ -60,6 +60,7 @@ const TransactionList = ({
             />
           )}
           keyExtractor={(item) => item.id || ""}
+          scrollEnabled={false}
         />
       </View>
 

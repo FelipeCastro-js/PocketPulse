@@ -38,13 +38,6 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
         color={"#FFFFFF"}
       />
     ),
-    graphs: (focused) => (
-      <Icons.ChartPieSlice
-        size={verticalScale(20)}
-        weight={focused ? "fill" : "regular"}
-        color={"#FFFFFF"}
-      />
-    ),
     profile: (focused) => (
       <Icons.User
         size={verticalScale(20)}
@@ -58,16 +51,16 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
     home: "Home",
     statistics: "Stats",
     wallet: "Wallet",
-    graphs: "Charts",
     profile: "Profile",
   };
+
+  const visibleRoute = state.routes.filter((r) => !!iconByRoute[r.name]);
 
   return (
     <View
       pointerEvents="box-none"
       style={[
         styles.root,
-
         {
           bottom: Math.max(insets.bottom, verticalScale(8)) + verticalScale(10),
         },
@@ -80,9 +73,9 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
           end={{ x: 1, y: 0.5 }}
           style={styles.bar}
         >
-          {state.routes.map((route, index) => {
+          {visibleRoute.map((route) => {
             const { options } = descriptors[route.key];
-            const isFocused = state.index === index;
+            const isFocused = state.routes[state.index]?.key === route.key;
             const Icon = iconByRoute[route.name];
 
             const onPress = () => {
@@ -96,10 +89,6 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
               }
             };
 
-            const onLongPress = () => {
-              navigation.emit({ type: "tabLongPress", target: route.key });
-            };
-
             return (
               <TouchableOpacity
                 key={route.key}
@@ -107,22 +96,22 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
                 accessibilityState={isFocused ? { selected: true } : {}}
                 accessibilityLabel={options.tabBarAccessibilityLabel}
                 onPress={onPress}
-                onLongPress={onLongPress}
+                onLongPress={() =>
+                  navigation.emit({ type: "tabLongPress", target: route.key })
+                }
                 activeOpacity={0.9}
                 style={styles.slot}
                 hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
               >
                 {isFocused ? (
                   <View style={styles.activePill}>
-                    {Icon ? Icon(true) : null}
+                    {Icon?.(true)}
                     <Text style={styles.activeLabel}>
                       {labelByRoute[route.name] ?? route.name}
                     </Text>
                   </View>
                 ) : (
-                  <View style={styles.iconOnly}>
-                    {Icon ? Icon(false) : null}
-                  </View>
+                  <View style={styles.iconOnly}>{Icon?.(false)}</View>
                 )}
               </TouchableOpacity>
             );
