@@ -15,7 +15,17 @@ import { signOut } from "firebase/auth";
 import { limit, orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { height } = Dimensions.get("window");
+
+const HERO_H = Math.min(verticalScale(320), height * 0.3);
 
 const Home = () => {
   const { user } = useAuth();
@@ -55,7 +65,7 @@ const Home = () => {
                   {user?.name || " "}
                 </Typo>
               </View>
-              <View style={{ width: verticalScale(34) }} />
+
               <TouchableOpacity
                 onPress={() => router.push("/(modals)/searchModal")}
                 style={styles.searchIcon}
@@ -70,9 +80,9 @@ const Home = () => {
             </View>
 
             <View pointerEvents="none" style={styles.rings}>
-              <View style={[styles.ring, { width: 280, height: 280 }]} />
-              <View style={[styles.ring, { width: 200, height: 200 }]} />
-              <View style={[styles.ring, { width: 140, height: 140 }]} />
+              <View style={[styles.ring, { width: 320, height: 320 }]} />
+              <View style={[styles.ring, { width: 230, height: 230 }]} />
+              <View style={[styles.ring, { width: 160, height: 160 }]} />
             </View>
           </LinearGradient>
 
@@ -126,7 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral100,
   },
   heroGradient: {
-    height: verticalScale(190),
+    height: HERO_H,
     paddingTop: spacingY._10,
     paddingHorizontal: spacingX._20,
     borderBottomLeftRadius: radius._30,
@@ -139,6 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 1,
+    marginTop: spacingY._10,
   },
   searchIcon: {
     backgroundColor: "rgba(255,255,255,0.22)",
@@ -148,18 +159,18 @@ const styles = StyleSheet.create({
   rings: {
     position: "absolute",
     right: -40,
-    top: 10,
+    top: 6,
     opacity: 0.18,
   },
   ring: {
     borderWidth: 1,
     borderColor: "#FFFFFF",
     borderRadius: 999,
-    marginVertical: scale(14),
+    marginVertical: scale(16),
   },
 
   cardHolder: {
-    marginTop: verticalScale(-36),
+    marginTop: -verticalScale(110),
     paddingHorizontal: spacingX._20,
   },
 
